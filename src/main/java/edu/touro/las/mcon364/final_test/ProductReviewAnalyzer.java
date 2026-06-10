@@ -28,7 +28,7 @@ import java.util.stream.*;
 public class ProductReviewAnalyzer {
 
     //TODO - uncomment this field and initialize it in the constructor to store categories.
-    //private final List<String> categories;
+    private final List<String> categories;
 
     /**
      * Store the category tags that this analyzer will examine.
@@ -37,6 +37,7 @@ public class ProductReviewAnalyzer {
      */
     public ProductReviewAnalyzer(List<String> categories) {
       //TODO - implement this constructor
+        this.categories = new ArrayList<>(categories);
     }
 
     /**
@@ -47,7 +48,8 @@ public class ProductReviewAnalyzer {
      */
     public Map<String, Long> buildCategoryFrequencyMap() {
         //TODO - implement this method
-        return null;
+      //return categories.stream().collect(Collectors.groupingBy(String::toString, Collectors.counting()));
+      return categories.stream().sorted().collect(Collectors.toMap(c -> c, c -> 1l));
     }
 
     /**
@@ -58,7 +60,8 @@ public class ProductReviewAnalyzer {
      */
     public List<String> getTopNCategories(int n) {
         //TODO - implement this method
-        return null;
+        //
+       return categories.stream().sorted(Comparator.reverseOrder()).limit(n).collect(Collectors.toList());
     }
 
     /**
@@ -69,7 +72,8 @@ public class ProductReviewAnalyzer {
      */
     public List<String> getCategoriesStartingWith(char prefix) {
         //TODO - implement this method
-        return null;
+        List<String> collect = categories.stream().filter(n -> n.startsWith(String.valueOf(prefix))).sorted().collect(Collectors.toList());
+        return Collections.unmodifiableList(collect);
     }
 
     /**
@@ -81,6 +85,6 @@ public class ProductReviewAnalyzer {
      */
     public Optional<String> getMostReviewedInRange(String from, String to) {
         //TODO - implement this method
-        return Optional.empty();
+        return categories.stream().filter(n->n.contains(from) && n.contains(to)).findFirst();
     }
 }

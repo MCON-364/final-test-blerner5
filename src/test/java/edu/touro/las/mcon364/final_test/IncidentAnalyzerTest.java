@@ -39,7 +39,7 @@ class IncidentAnalyzerTest {
 
         assertEquals(1L, analyzer.getClosedCount(),
                 "Analyzer should not reflect tickets added to source list after construction");
-        assertEquals(10.0, analyzer.getAverageTimeToClose(), 0.000001,
+        assertEquals(10.0F, (Float) analyzer.getAverageTimeToClose(), 0.000001,
                 "Average must be computed only over the originally copied incidents");
     }
 
@@ -82,7 +82,7 @@ class IncidentAnalyzerTest {
                 ticket("network", Priority.HIGH, false, 15),
                 ticket("db", Priority.MEDIUM, false, 50)
         ));
-        assertEquals(0.0, analyzer.getAverageTimeToClose(), 0.000001);
+        assertEquals(0.0F, (Float) analyzer.getAverageTimeToClose(), 0.000001);
     }
 
     @Test
@@ -92,7 +92,7 @@ class IncidentAnalyzerTest {
                 ticket("db", Priority.MEDIUM, true, 20),
                 ticket("ui", Priority.LOW, false, 999)   // must NOT affect average
         ));
-        assertEquals(15.0, analyzer.getAverageTimeToClose(), 0.000001);
+        assertEquals(15.0F, (Float) analyzer.getAverageTimeToClose(), 0.000001);
     }
 
     @Test
@@ -100,13 +100,13 @@ class IncidentAnalyzerTest {
         IncidentAnalyzer analyzer = new IncidentAnalyzer(List.of(
                 ticket("network", Priority.HIGH, true, 42)
         ));
-        assertEquals(42.0, analyzer.getAverageTimeToClose(), 0.000001);
+        assertEquals(42.0F, (Float) analyzer.getAverageTimeToClose(), 0.000001);
     }
 
     @Test
     void getAverageTimeToCloseOnEmptyList() {
         IncidentAnalyzer analyzer = new IncidentAnalyzer(List.of());
-        assertEquals(0.0, analyzer.getAverageTimeToClose(), 0.000001);
+        assertEquals(0.0F, (Float) analyzer.getAverageTimeToClose(), 0.000001);
     }
 
     // ── getCountByCategory ─────────────────────────────────────────────────────

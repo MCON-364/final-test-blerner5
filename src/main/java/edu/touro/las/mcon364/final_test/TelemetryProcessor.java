@@ -1,6 +1,11 @@
 package edu.touro.las.mcon364.final_test;
 
-import java.util.DoubleSummaryStatistics;
+import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * TelemetryProcessor – concurrent sensor-data pipeline
@@ -30,6 +35,135 @@ import java.util.DoubleSummaryStatistics;
  * - Use java.util.concurrent building blocks. Do not use raw synchronized blocks.
  */
 public class TelemetryProcessor {
+    AtomicInteger totalProcessed = new AtomicInteger(0);
+    private boolean running = false;
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    Queue queue = new BlockingQueue() {
+        @Override
+        public boolean add(Object o) {
+            return false;
+        }
+
+        @Override
+        public boolean offer(Object o) {
+            return false;
+        }
+
+        @Override
+        public void put(Object o) throws InterruptedException {
+
+        }
+
+        @Override
+        public boolean offer(Object o, long timeout, TimeUnit unit) throws InterruptedException {
+            return false;
+        }
+
+        @Override
+        public Object take() throws InterruptedException {
+            return null;
+        }
+
+        @Override
+        public Object poll(long timeout, TimeUnit unit) throws InterruptedException {
+            return null;
+        }
+
+        @Override
+        public int remainingCapacity() {
+            return 0;
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            return false;
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return false;
+        }
+
+        @Override
+        public int drainTo(Collection c) {
+            return 0;
+        }
+
+        @Override
+        public int drainTo(Collection c, int maxElements) {
+            return 0;
+        }
+
+        @Override
+        public Object remove() {
+            return null;
+        }
+
+        @Override
+        public Object poll() {
+            return null;
+        }
+
+        @Override
+        public Object element() {
+            return null;
+        }
+
+        @Override
+        public Object peek() {
+            return null;
+        }
+
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public Iterator iterator() {
+            return null;
+        }
+
+        @Override
+        public Object[] toArray() {
+            return new Object[0];
+        }
+
+        @Override
+        public Object[] toArray(Object[] a) {
+            return new Object[0];
+        }
+
+        @Override
+        public boolean containsAll(Collection c) {
+            return false;
+        }
+
+        @Override
+        public boolean addAll(Collection c) {
+            return false;
+        }
+
+        @Override
+        public boolean removeAll(Collection c) {
+            return false;
+        }
+
+        @Override
+        public boolean retainAll(Collection c) {
+            return false;
+        }
+
+        @Override
+        public void clear() {
+
+        }
+    };
 
     // ── declare whatever fields you need ─────────────────────────────────────
 
@@ -45,6 +179,15 @@ public class TelemetryProcessor {
      */
     public void submit(TelemetryEvent event) {
         //TODO - implement this method
+        if(event == null) {
+            throw new IllegalArgumentException();
+        }
+        while(!running) {
+            System.out.println("TelemetryProcessor is not running yet");
+            break;
+        }
+        queue.add(event);
+
     }
 
     /**
@@ -54,7 +197,20 @@ public class TelemetryProcessor {
      */
     public void start(int workerCount) {
         //TODO - implement this method
+        if(workerCount <= 0) {
+            throw new IllegalArgumentException();
+        }
+        if(executor != null) {
+            throw new IllegalStateException("Processor already started");
+        }
+        running = true;
+        executor = Executors.newFixedThreadPool(workerCount);
+        for(int i = 0; i < workerCount; i++){
+            executor.submit(this::getStats);
+        }
     }
+
+
 
     /**
      * Stop processing events.
@@ -62,6 +218,8 @@ public class TelemetryProcessor {
      */
     public void stop() throws InterruptedException {
         //TODO - implement this method
+        executor.shutdown();
+
     }
 
     /**
@@ -69,7 +227,7 @@ public class TelemetryProcessor {
      */
     public int getTotalProcessed() {
         //TODO - implement this method
-        return 0;
+        return getTotalProcessed();
     }
 
     /**
@@ -82,6 +240,10 @@ public class TelemetryProcessor {
      */
     public DoubleSummaryStatistics getStats() {
         //TODO - implement this method
-        return null;
+        DoubleSummaryStatistics stats = new DoubleSummaryStatistics();
+        for(long i = 0; i < totalProcessed.get(); i++){
+            stats.accept((double) queue.poll());
+        }
+        return stats;
     }
 }

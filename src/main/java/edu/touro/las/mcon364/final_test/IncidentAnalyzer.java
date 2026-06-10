@@ -1,8 +1,5 @@
 package edu.touro.las.mcon364.final_test;
 
-import edu.touro.las.mcon364.final_test.Priority;
-import edu.touro.las.mcon364.final_test.SupportTicket;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,7 +25,7 @@ import java.util.stream.Collectors;
  */
 public class IncidentAnalyzer {
     //TODO - uncomment this field and initialize it in the constructor to store the incidents passed in.
-    //private final List<SupportTicket> incidents;
+    private final List<SupportTicket> incidents;
 
     /**
      * Store the incidents that this analyzer will examine.
@@ -36,25 +33,25 @@ public class IncidentAnalyzer {
      * external modification of the internal state of this class. If the input list is null, throw an NullPointerException.
      */
     public IncidentAnalyzer(List<SupportTicket> incidents) {
-       //TODO - implement this constructor
+       this.incidents = List.copyOf(incidents);
     }
 
     /**
      * Return how many incidents in this data set were closed.
      */
-    public long getClosedCount() {
+    public List<SupportTicket> getClosedCount() {
         //TODO - implement this method
-        return -1;
+        return incidents.stream().filter(i->i.resolved()==true).collect(Collectors.toList());
     }
 
     /**
      * Return the average closing time for closed incidents only.
-     *
+     * <p>
      * Incidents that are still open should not affect this average.
      */
-    public double getAverageTimeToClose() {
+    public Object getAverageTimeToClose() {
         //TODO - implement this method
-        return 0.0;
+        return incidents.stream().filter(n->n.resolved()== true).map(SupportTicket::minutesToResolve).collect(Collectors.toList());
     }
 
     /**
@@ -62,7 +59,7 @@ public class IncidentAnalyzer {
      */
     public Map<String, Long> getCountByCategory() {
         //TODO - implement this method
-        return null;
+        return incidents.stream().collect(Collectors.groupingBy(SupportTicket::category,  Collectors.counting()));
     }
 
     /**
@@ -70,6 +67,6 @@ public class IncidentAnalyzer {
      */
     public List<SupportTicket> getCriticalOpenIncidents() {
         //TODO - implement this method
-        return null;
+        return incidents.stream().filter(i->i.resolved()!=true).collect(Collectors.toUnmodifiableList());
     }
 }
